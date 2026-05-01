@@ -1,15 +1,11 @@
 alacritty
-audacity
 base
 base-devel
 clang
-cloc
 cmake
 fastfetch
 feh
-flatpak
 fzf
-ghidra
 git
 htop
 keepassxc
@@ -18,10 +14,8 @@ mpv
 neovim
 ninja
 noto-fonts
-noto-fonts-cjk
 noto-fonts-emoji
 nsxiv
-openbsd-netcat
 openssh
 pavucontrol
 pcmanfm
@@ -30,8 +24,6 @@ pipewire
 pipewire-alsa
 pipewire-jack
 pipewire-pulse
-radare2
-redshift
 ripgrep
 rsync
 rustup
@@ -41,10 +33,6 @@ ttc-iosevka
 ttf-inconsolata-nerd
 ufw
 unzip
-vim
-vulkan-headers
-vulkan-tools
-vulkan-validation-layers
 wget
 wireguard-tools
 wireplumber
