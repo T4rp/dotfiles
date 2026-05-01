@@ -41,6 +41,7 @@ ttc-iosevka
 ttf-inconsolata-nerd
 ufw
 unzip
+vim
 vulkan-headers
 vulkan-tools
 vulkan-validation-layers

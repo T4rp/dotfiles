@@ -1,0 +1,2 @@
+cd ~/Pictures/Screenshots
+scrot $@
