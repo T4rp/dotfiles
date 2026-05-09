@@ -694,37 +694,76 @@ require("lazy").setup({
             --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
             --  - settings (table): Override the default settings passed when initializing the server.
             --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
-            local servers = {
-                -- clangd = {},
-                -- gopls = {},
-                -- pyright = {},
-                -- rust_analyzer = {},
-                -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
-                --
-                -- Some languages (like typescript) have entire language plugins that can be useful:
-                --    https://github.com/pmizio/typescript-tools.nvim
-                --
-                -- But for many setups, the LSP (`ts_ls`) will work just fine
-                -- ts_ls = {},
-                --
 
-                lua_ls = {
-                    -- cmd = { ... },
-                    -- filetypes = { ... },
-                    -- capabilities = {},
+            local vue_language_server_path = vim.fn.expand("$MASON/packages")
+                .. "/vue-language-server"
+                .. "/node_modules/@vue/language-server"
+            local tsserver_filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" }
+
+            local servers = {
+                clangd = {},
+                gopls = {},
+                pyright = {},
+                rust_analyzer = {},
+                emmet_language_server = {},
+
+                vtsls = {
+                    filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
                     settings = {
-                        Lua = {
-                            completion = {
-                                callSnippet = "Replace",
+                        vtsls = {
+                            tsserver = {
+                                globalPlugins = {
+                                    {
+                                        name = "@vue/typescript-plugin",
+                                        location = vue_language_server_path,
+                                        languages = { "vue" },
+                                        configNamespace = "typescript",
+                                    },
+                                },
                             },
-                            -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-                            -- diagnostics = { disable = { 'missing-fields' } },
                         },
                     },
                 },
-            }
+                vue_ls = {},
 
-            -- Ensure the servers and tools above are installed
+                lua_ls = {
+                    on_init = function(client)
+                        client.server_capabilities.documentFormattingProvider = false -- Disable formatting (formatting is done by stylua)
+
+                        if client.workspace_folders then
+                            local path = client.workspace_folders[1].name
+                            if
+                                path ~= vim.fn.stdpath("config")
+                                and (vim.uv.fs_stat(path .. "/.luarc.json") or vim.uv.fs_stat(path .. "/.luarc.jsonc"))
+                            then
+                                return
+                            end
+                        end
+
+                        client.config.settings.Lua = vim.tbl_deep_extend("force", client.config.settings.Lua, {
+                            runtime = {
+                                version = "LuaJIT",
+                                path = { "lua/?.lua", "lua/?/init.lua" },
+                            },
+                            workspace = {
+                                checkThirdParty = false,
+                                -- NOTE: this is a lot slower and will cause issues when working on your own configuration.
+                                --  See https://github.com/neovim/nvim-lspconfig/issues/3189
+                                library = vim.tbl_extend("force", vim.api.nvim_get_runtime_file("", true), {
+                                    "${3rd}/luv/library",
+                                    "${3rd}/busted/library",
+                                }),
+                            },
+                        })
+                    end,
+                    ---@type lspconfig.settings.lua_ls
+                    settings = {
+                        Lua = {
+                            format = { enable = false }, -- Disable formatting (formatting is done by stylua)
+                        },
+                    },
+                },
+            } -- Ensure the servers and tools above are installed
             --
             -- To check the current status of installed tools and/or manually install
             -- other tools, you can run
@@ -738,25 +777,13 @@ require("lazy").setup({
             -- You can add other tools here that you want Mason to install
             -- for you, so that they are available from within Neovim.
             local ensure_installed = vim.tbl_keys(servers or {})
-            vim.list_extend(ensure_installed, {
-                "stylua", -- Used to format Lua code
-            })
+            vim.list_extend(ensure_installed, {})
             require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
-            require("mason-lspconfig").setup({
-                ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
-                automatic_installation = false,
-                handlers = {
-                    function(server_name)
-                        local server = servers[server_name] or {}
-                        -- This handles overriding only values explicitly passed
-                        -- by the server configuration above. Useful when disabling
-                        -- certain features of an LSP (for example, turning off formatting for ts_ls)
-                        server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-                        require("lspconfig")[server_name].setup(server)
-                    end,
-                },
-            })
+            for name, server in pairs(servers) do
+                vim.lsp.config(name, server)
+                vim.lsp.enable(name)
+            end
         end,
     },
 
