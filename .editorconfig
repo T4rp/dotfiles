@@ -1,0 +1,14 @@
+root = true
+
+indent_size = 4
+
+[*.{html,css,scss,less,js,jsx,ts,tsx,vue}]
+indent_size = 2
+
+[*.{c,h,cc,hh,cpp,hpp}]
+indent_size = 4
+indent_style = spaces
+
+[*.{lua}]
+indent_style = tab
+indent_size = 4
