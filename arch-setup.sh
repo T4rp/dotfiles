@@ -19,6 +19,8 @@ _dots() {
     cp -r "$DOTFILES/nvim" ~/.config
     cp "$DOTFILES/.xinitrc" ~/
     cp "$DOTFILES/.tmux.conf" ~/
+    cp "$DOTFILES/.editorconfig" ~/
+    cp "$DOTFILES/.clang-format" ~/
     mkdir -p ~/.local/bin
     cp "$DOTFILES/scripts/"* ~/.local/bin/
 }
