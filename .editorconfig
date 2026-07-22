@@ -1,14 +1,31 @@
 root = true
 
+[*]
 indent_size = 4
 
-[*.{html,css,scss,less,js,jsx,ts,tsx,vue}]
+[*.{html,css,scss,less,js,jsx,ts,tsx,vue,json}]
 indent_size = 2
+indent_style = space
 
-[*.{c,h,cc,hh,cpp,hpp}]
+[*.{c,h,cc,hh,cpp,hpp,py}]
 indent_size = 4
 indent_style = space
 
-[*.{lua}]
+[{Makefile}]
+indent_style = tab
+
+[*.{cmake}]
+indent_size = 2
+indent_style = space
+
+[CMakeLists.txt]
+indent_size = 2
+indent_style = space
+
+[*.{lua,luau}]
 indent_style = tab
 indent_size = 4
+
+[*.md]
+trim_trailing_whitespace = false
+
