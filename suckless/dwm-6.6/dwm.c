@@ -810,7 +810,7 @@ drawbar(Monitor *m)
 	if (m == selmon) { /* status is only drawn on selected monitor */
 		drw_setscheme(drw, scheme[SchemeNorm]);
 		tw = TEXTW(stext) - lrpad / 2 + 2; /* 2px extra right padding */
-		drw_text(drw, m->ww - sw - 2 * sp - stw, 0, sw, bh, lrpad / 2 - 2, stext, 0);
+		drw_text(drw, m->ww - tw - 2 * sp - stw, 0, tw, bh, lrpad / 2 - 2, stext, 0);
 	}
 
 	resizebarwin(m);
@@ -1921,9 +1921,9 @@ togglebar(const Arg *arg)
 		if (!selmon->showbar)
 			wc.y = -bh;
 		else if (selmon->showbar) {
-			wc.y = 0;
+			wc.y = 0 + vp;
 			if (!selmon->topbar)
-				wc.y = selmon->mh - bh;
+				wc.y = selmon->mh - bh - vp;
 		}
 		XConfigureWindow(dpy, systray->win, CWY, &wc);
 	}
@@ -2284,6 +2284,7 @@ updatesystrayiconstate(Client *i, XPropertyEvent *ev)
 			systray->win, XEMBED_EMBEDDED_VERSION);
 }
 
+// TODO: we need to fix bottom bar systray
 void
 updatesystray(void)
 {
